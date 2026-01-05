@@ -1,16 +1,32 @@
 import pandas as pd
 import pyreadstat
 import os
+import re
 
-import config
+def get_config():
+    cfg = {}
+    config_path = 'config.py'
 
-# --- 설정 구간 ---
-input_file = config.INPUT_FILE       # 변환할 원본 파일명 (같은 폴더에 있어야 함)
-output_file = config.OUTPUT_FILE     # 저장될 SPSS 파일명
-encoding_type = config.ENCODING_TYPE       # 한글이 깨지면 'cp949'로 변경하세요
-# ----------------
+    if not os.path.exists(config_path):
+        return cfg
+
+    with open(config_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+        # 변수명 = '값' 형태를 찾아내기 위한 정규표현식
+        for key in ['INPUT_FILE', 'OUTPUT_FILE', 'ENCODING_TYPE']:
+            match = re.search(fr"{key}\s*=\s*['\"](.*?)['\"]", content)
+            if match:
+                cfg[key] = match.group(1)
+    return cfg
+
 
 def run_convert():
+    cfg = get_config()
+
+    input_file = cfg.get('INPUT_FILE', '')
+    output_file = cfg.get('OUTPUT_FILE', '')
+    encoding_type = cfg.get('ENCODING_TYPE', '')
+
     if not input_file or not str(input_file).strip():
         print("❌ 에러: config.py 파일의 INPUT_FILE 설정값이 비어 있습니다.")
         print("👉 config.py 파일을 열어 원본 파일명을 정확히 입력해 주세요.")
@@ -32,7 +48,6 @@ def run_convert():
 
     print(f"'{input_file}' 읽는 중...")
 	
-    
     try:
         # 데이터 읽기 (컬럼이 너무 많아도 파이썬은 잘 읽습니다)
         df = pd.read_csv(input_file, encoding=encoding_type)
