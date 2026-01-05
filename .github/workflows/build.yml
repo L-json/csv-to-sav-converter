@@ -23,7 +23,7 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        pyinstaller --onefile convert.py
+        pyinstaller --onefile --hidden-import="pyreadstat._readstat_writer" convert.py
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
