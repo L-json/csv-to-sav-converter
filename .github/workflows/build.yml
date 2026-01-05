@@ -23,7 +23,7 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        pyinstaller --onefile --collect-submodules pyreadstat convert.py
+        pyinstaller --onefile --collect-submodules pyreadstat --exclude-module config convert.py
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
